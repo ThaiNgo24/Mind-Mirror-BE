@@ -40,6 +40,7 @@ router.post("/register", async (req, res) => {
         name: user.name,
         email: user.email,
       },
+      reload: true,
     });
   } catch (error) {
     console.error("Registration error:", error);
@@ -88,6 +89,7 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
       },
+      reload: true,
     });
   } catch (error) {
     console.error("Login error:", error);
