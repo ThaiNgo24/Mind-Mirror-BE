@@ -3,9 +3,13 @@ const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 const app = express();
+const swaggerDocument = YAML.load('./swagger.yaml');
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Middleware
 app.use(
   cors({
@@ -50,3 +54,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+

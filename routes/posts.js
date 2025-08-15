@@ -8,8 +8,14 @@ const User = require("../models/User");
 router.get("/", async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate("author", "name")
-      .populate("comments.author", "name")
+      .populate({
+        path: "author",
+        select: "name _id",
+      })
+      .populate({
+        path: "comments.author",
+        select: "name _id",
+      })
       .sort({ createdAt: -1 });
 
     res.json(posts);
@@ -33,8 +39,10 @@ router.post("/", authenticateToken, async (req, res) => {
     });
 
     await newPost.save();
-    const populatedPost = await Post.findById(newPost._id)
-      .populate("author", "name");
+    const populatedPost = await Post.findById(newPost._id).populate(
+      "author",
+      "name _id"
+    );
 
     res.status(201).json(populatedPost);
   } catch (error) {
@@ -66,17 +74,55 @@ router.post("/:id/comments", authenticateToken, async (req, res) => {
     await post.save();
 
     const populatedPost = await Post.findById(post._id)
-      .populate("comments.author", "name");
+      .populate({
+        path: "author",
+        select: "name _id",
+      })
+      .populate({
+        path: "comments.author",
+        select: "name _id",
+      });
 
-    const addedComment = populatedPost.comments.find(
-      c => c.createdAt.toString() === newComment.createdAt.toString()
-    );
-
-    res.status(201).json(addedComment);
+    res.status(201).json(populatedPost);
   } catch (error) {
     console.error("Error adding comment:", error);
     res.status(500).json({ error: "Failed to add comment" });
   }
 });
+
+router.delete(
+  "/:postId/comments/:commentId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.postId);
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      const commentIndex = post.comments.findIndex(
+        (c) => c._id.toString() === req.params.commentId
+      );
+
+      if (commentIndex === -1) {
+        return res.status(404).json({ error: "Comment not found" });
+      }
+
+      if (post.comments[commentIndex].author.toString() !== req.user.userId) {
+        return res
+          .status(403)
+          .json({ error: "Not authorized to delete this comment" });
+      }
+
+      post.comments.splice(commentIndex, 1);
+      await post.save();
+
+      res.status(200).json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ error: "Failed to delete comment" });
+    }
+  }
+);
 
 module.exports = router;
