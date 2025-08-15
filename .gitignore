@@ -1,16 +1,10 @@
-# Thư viện cài qua npm/yarn
+# Bỏ node_modules
 node_modules/
 config.js
 
-# Log
-npm-debug.log
-yarn-error.log
+# Bỏ các file lock
+package-lock.json
+yarn.lock
 
-# Build output
-dist/
-build/
-
-# File hệ thống
-.DS_Store
-
+# Bỏ các file môi trường
 .env
