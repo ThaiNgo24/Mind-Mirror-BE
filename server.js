@@ -14,7 +14,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Middleware
 app.use(
   cors({
-    origin:"https://mind-mirror-fe.onrender.com/main.html",
+    origin:"https://mind-mirror-fe.onrender.com",
     credentials: true,
   })
 );
