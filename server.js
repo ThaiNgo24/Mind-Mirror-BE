@@ -9,15 +9,16 @@ const YAML = require('yamljs');
 const app = express();
 const swaggerDocument = YAML.load('./swagger.yaml');
 
+//api docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Middleware
 app.use(
   cors({
-    origin: "https://mind-mirror-fe.onrender.com/main.html",
+    origin:"https://mind-mirror-fe.onrender.com/main.html",
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json()); 
 
 // Kết nối MongoDB
 mongoose
@@ -36,12 +37,12 @@ app.use("/api/user", userRoutes);
 app.use("/api/posts", postRoutes);
 
 // Serve static files
-app.use(express.static(path.join(__dirname, "../FE")));
+// app.use(express.static(path.join(__dirname, "../FE")));
 
-// Handle all routes for SPA
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../FE/main.html"));
-});
+// // Handle all routes for SPA
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../FE/main.html"));
+// });
 
 // Error handling
 app.use((err, req, res, next) => {
